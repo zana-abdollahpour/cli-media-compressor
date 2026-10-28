@@ -25,7 +25,7 @@ func Supports(ext string) bool {
 
 // File recompresses a video with FFmpeg. It keeps the source if encoding does
 // not reduce its size. FFmpeg must be bundled or available on PATH.
-func File(src, dst string) (int64, int64, error) {
+func File(src, dst string, quality int) (int64, int64, error) {
 	ffmpeg, err := ffmpegExecutable()
 	if err != nil {
 		return 0, 0, fmt.Errorf("prepare FFmpeg: %w", err)
@@ -40,9 +40,9 @@ func File(src, dst string) (int64, int64, error) {
 	defer os.Remove(tmp)
 	args := []string{"-hide_banner", "-loglevel", "error", "-y", "-i", src, "-map", "0:v:0", "-map", "0:a?"}
 	if ext == ".webm" {
-		args = append(args, "-c:v", "libvpx-vp9", "-crf", "32", "-b:v", "0", "-c:a", "libopus")
+		args = append(args, "-c:v", "libvpx-vp9", "-crf", fmt.Sprint(webMCRF(quality)), "-b:v", "0", "-c:a", "libopus")
 	} else {
-		args = append(args, "-c:v", "libx264", "-crf", "28", "-preset", "medium", "-c:a", "aac", "-b:a", "128k")
+		args = append(args, "-c:v", "libx264", "-crf", fmt.Sprint(h264CRF(quality)), "-preset", "medium", "-c:a", "aac", "-b:a", "128k")
 	}
 	if ext == ".mp4" || ext == ".m4v" || ext == ".mov" {
 		args = append(args, "-movflags", "+faststart")
@@ -74,6 +74,19 @@ func File(src, dst string) (int64, int64, error) {
 	return inInfo.Size(), outInfo.Size(), nil
 }
 
+func h264CRF(quality int) int {
+	if quality <= 40 {
+		return 40 - (quality-1)*12/39
+	}
+	return 28 - (quality-40)*10/60
+}
+
+func webMCRF(quality int) int {
+	if quality <= 40 {
+		return 50 - (quality-1)*18/39
+	}
+	return 32 - (quality-40)*8/60
+}
 func copyOriginal(src, dst string) error {
 	input, err := os.Open(src)
 	if err != nil {

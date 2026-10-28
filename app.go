@@ -13,13 +13,21 @@ import (
 
 type config struct {
 	outputDir       string
+	imageQuality    int
+	videoQuality    int
+	imageQualitySet bool
+	videoQualitySet bool
 	quality         int
 	qualityExplicit bool
 	verbose         bool
 }
 
 func run(cfg config, in io.Reader, out, errOut io.Writer) error {
-	quality, err := resolveQuality(cfg, in, out, errOut)
+	imageQuality, err := resolveQuality("Image", cfg.imageQuality, cfg.imageQualitySet, in, out)
+	if err != nil {
+		return err
+	}
+	videoQuality, err := resolveQuality("Video", cfg.videoQuality, cfg.videoQualitySet, in, out)
 	if err != nil {
 		return err
 	}
@@ -65,9 +73,9 @@ func run(cfg config, in io.Reader, out, errOut io.Writer) error {
 
 		var inSize, outSize int64
 		if isVideo {
-			inSize, outSize, err = videos.File(path, dst)
+			inSize, outSize, err = videos.File(path, dst, videoQuality)
 		} else {
-			inSize, outSize, err = images.File(path, dst, quality)
+			inSize, outSize, err = images.File(path, dst, imageQuality)
 		}
 		if err != nil {
 			fmt.Fprintf(errOut, "  [ERROR] %s: %v\n", rel, err)

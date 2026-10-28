@@ -7,7 +7,7 @@
 - Images: JPEG (`.jpg`, `.jpeg`), PNG, and GIF
 - Videos: MP4, M4V, MOV, AVI, MKV, and WebM
 
-Image quality applies to JPEG encoding. PNG and GIF are re-encoded with their respective encoders. Video compression uses H.264/AAC for most formats and VP9/Opus for WebM.
+Image and video quality are configured separately. Image quality applies to JPEG encoding; video quality controls video encoding. PNG and GIF are re-encoded with their respective encoders. Video compression uses H.264/AAC for most formats and VP9/Opus for WebM. The percentage is mapped to each codec's quality scale; it is a preference, not a promise about file size or a literal visual-quality percentage.
 
 ## Build
 
@@ -53,25 +53,30 @@ Run the program from the directory tree you want to process:
 mediacompress
 ```
 
-By default, it prompts for JPEG quality from 1 to 100 (default 40), then scans the current directory recursively and writes results to `compressed/`, keeping each file's relative path. The output directory is excluded from scanning.
+By default, it prompts separately for image quality and video quality from 1 to 100 (each defaults to 40), then scans the current directory recursively and writes results to `compressed/`, keeping each file's relative path. The output directory is excluded from scanning.
 
 Options:
 
 ```text
--out string     output directory (default "compressed")
--quality int    JPEG quality from 1 to 100; supplying this skips the prompt (default 40)
--v              print input and output sizes for each file
+-out string         output directory (default "compressed")
+-image-quality int  image quality from 1 to 100; skips the image prompt (default 40)
+-video-quality int  video quality from 1 to 100; skips the video prompt (default 40)
+-quality int        set both image and video quality from 1 to 100; skips both prompts
+-v                  print input and output sizes for each file
 -h              show command-line help
 ```
 
 Examples:
 
 ```sh
-# Use the default output directory and answer the quality prompt
+# Use the default output directory and answer the image and video quality prompts
 mediacompress
 
-# Set quality and output directory without prompting
+# Set both qualities and output directory without prompting
 mediacompress -quality 65 -out optimized
+
+# Set image and video quality independently
+mediacompress -image-quality 75 -video-quality 50
 
 # Include per-file size details
 mediacompress -quality 65 -v

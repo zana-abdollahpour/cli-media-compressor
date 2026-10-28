@@ -17,14 +17,29 @@ func main() {
 func parseFlags() config {
 	cfg := config{}
 	flag.StringVar(&cfg.outputDir, "out", "compressed", "output directory")
-	flag.IntVar(&cfg.quality, "quality", 40, "JPEG quality (1-100), higher = better quality")
+	flag.IntVar(&cfg.imageQuality, "image-quality", defaultQuality, "image quality (1-100), higher = better quality")
+	flag.IntVar(&cfg.videoQuality, "video-quality", defaultQuality, "video quality (1-100), higher = better quality")
+	flag.IntVar(&cfg.quality, "quality", defaultQuality, "set both image and video quality (1-100)")
 	flag.BoolVar(&cfg.verbose, "v", false, "verbose output")
 	flag.Parse()
-	cfg.qualityExplicit = false
+
 	flag.Visit(func(f *flag.Flag) {
-		if f.Name == "quality" {
+		switch f.Name {
+		case "image-quality":
+			cfg.imageQualitySet = true
+		case "video-quality":
+			cfg.videoQualitySet = true
+		case "quality":
 			cfg.qualityExplicit = true
 		}
 	})
+	if cfg.qualityExplicit {
+		if !cfg.imageQualitySet {
+			cfg.imageQuality = cfg.quality
+		}
+		if !cfg.videoQualitySet {
+			cfg.videoQuality = cfg.quality
+		}
+	}
 	return cfg
 }
