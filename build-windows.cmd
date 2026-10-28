@@ -44,10 +44,10 @@ if errorlevel 1 exit /b 1
 if errorlevel 1 exit /b 1
 
 if not exist dist mkdir dist
-set "GOCACHE=%TEMP%\imgcompress-gocache"
+set "GOCACHE=%TEMP%\mediacompress-gocache"
 if not exist "%GOCACHE%" mkdir "%GOCACHE%"
-go build -tags embedffmpeg -o dist\imgcompress.exe .
+go build -tags embedffmpeg -o dist\mediacompress.exe .
 if errorlevel 1 exit /b 1
 
-echo Created self-contained executable: dist\imgcompress.exe
+echo Created self-contained executable: dist\mediacompress.exe
 

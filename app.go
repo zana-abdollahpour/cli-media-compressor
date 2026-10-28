@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"imgcompress/internal/images"
-	"imgcompress/internal/videos"
+	"mediacompress/internal/images"
+	"mediacompress/internal/videos"
 )
 
 type config struct {

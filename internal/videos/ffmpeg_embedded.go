@@ -17,7 +17,7 @@ func ffmpegExecutable() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("locate FFmpeg cache directory: %w", err)
 	}
-	installDir := filepath.Join(cacheDir, "imgcompress", "ffmpeg-2026-10-25-git-46f23be8b1")
+	installDir := filepath.Join(cacheDir, "mediacompress", "ffmpeg-2026-10-25-git-46f23be8b1")
 	if err := os.MkdirAll(installDir, 0700); err != nil {
 		return "", fmt.Errorf("create FFmpeg cache directory: %w", err)
 	}

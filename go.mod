@@ -1,4 +1,4 @@
-module imgcompress
+module mediacompress
 
 go 1.26.5
 
