@@ -7,7 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"imgcompress/internal/compress"
+	"imgcompress/internal/images"
+	"imgcompress/internal/videos"
 )
 
 type config struct {
@@ -47,7 +48,10 @@ func run(cfg config, in io.Reader, out, errOut io.Writer) error {
 			}
 			return nil
 		}
-		if !compress.Supports(filepath.Ext(path)) {
+
+		ext := filepath.Ext(path)
+		isVideo := videos.Supports(ext)
+		if !isVideo && !images.Supports(ext) {
 			return nil
 		}
 		rel, err := filepath.Rel(cwd, path)
@@ -58,9 +62,15 @@ func run(cfg config, in io.Reader, out, errOut io.Writer) error {
 		if err := os.MkdirAll(filepath.Dir(dst), 0755); err != nil {
 			return err
 		}
-		inSize, outSize, err := compress.File(path, dst, quality)
+
+		var inSize, outSize int64
+		if isVideo {
+			inSize, outSize, err = videos.File(path, dst)
+		} else {
+			inSize, outSize, err = images.File(path, dst, quality)
+		}
 		if err != nil {
-			fmt.Fprintf(errOut, "  ✗ %s: %v\n", rel, err)
+			fmt.Fprintf(errOut, "  âœ— %s: %v\n", rel, err)
 			skipped++
 			return nil
 		}
@@ -73,9 +83,9 @@ func run(cfg config, in io.Reader, out, errOut io.Writer) error {
 			if inSize > 0 {
 				pct = float64(saved) / float64(inSize) * 100
 			}
-			fmt.Fprintf(out, "  ✓ %-50s %8d → %8d  (%+.1f%%)\n", rel, inSize, outSize, -pct)
+			fmt.Fprintf(out, "  âœ“ %-50s %8d â†’ %8d  (%+.1f%%)\n", rel, inSize, outSize, -pct)
 		} else {
-			fmt.Fprintf(out, "  ✓ %s\n", rel)
+			fmt.Fprintf(out, "  âœ“ %s\n", rel)
 		}
 		return nil
 	})
@@ -91,7 +101,7 @@ func run(cfg config, in io.Reader, out, errOut io.Writer) error {
 	if totalIn > 0 {
 		saved := totalIn - totalOut
 		pct := float64(saved) / float64(totalIn) * 100
-		fmt.Fprintf(out, "Total: %d → %d bytes (saved %d bytes, %.1f%%)\n", totalIn, totalOut, saved, pct)
+		fmt.Fprintf(out, "Total: %d â†’ %d bytes (saved %d bytes, %.1f%%)\n", totalIn, totalOut, saved, pct)
 	}
 	return nil
 }

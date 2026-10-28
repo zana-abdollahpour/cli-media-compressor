@@ -1,4 +1,4 @@
-package compress
+package images
 
 import (
 	"fmt"
@@ -53,7 +53,8 @@ func File(src, dst string, quality int) (int64, int64, error) {
 	case "jpeg":
 		err = jpeg.Encode(out, img, &jpeg.Options{Quality: quality})
 	case "png":
-		err = (png.Encoder{CompressionLevel: png.BestCompression}).Encode(out, img)
+		encoder := png.Encoder{CompressionLevel: png.BestCompression}
+		err = encoder.Encode(out, img)
 	case "gif":
 		err = gif.Encode(out, img, nil)
 	default:
