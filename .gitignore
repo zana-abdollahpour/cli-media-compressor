@@ -27,3 +27,7 @@ coverage.txt
 .vscode/
 .DS_Store
 Thumbs.db
+
+# Local FFmpeg build input and extracted asset (used by build-windows.cmd)
+/internal/videos/assets/
+/ffmpeg-2026-10-25-git-46f23be8b1-essentials_build.7z

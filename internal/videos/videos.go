@@ -24,11 +24,11 @@ func Supports(ext string) bool {
 }
 
 // File recompresses a video with FFmpeg. It keeps the source if encoding does
-// not reduce its size. FFmpeg must be available on PATH.
+// not reduce its size. FFmpeg must be bundled or available on PATH.
 func File(src, dst string) (int64, int64, error) {
-	ffmpeg, err := exec.LookPath("ffmpeg")
+	ffmpeg, err := ffmpegExecutable()
 	if err != nil {
-		return 0, 0, fmt.Errorf("ffmpeg is required to compress videos (install it and add it to PATH): %w", err)
+		return 0, 0, fmt.Errorf("prepare FFmpeg: %w", err)
 	}
 	inInfo, err := os.Stat(src)
 	if err != nil {
